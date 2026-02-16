@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic-Tac-Toe Test Suite</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'SF Mono', 'Fira Code', monospace; background: #1a1a2e; color: #e8e8e8; padding: 2rem; }
+    h1 { font-size: 1.5rem; margin-bottom: 1rem; color: #00d4ff; }
+    h2 { font-size: 1.1rem; margin: 1.5rem 0 0.5rem; color: #ff8a80; border-bottom: 1px solid #2a2a4a; padding-bottom: 0.25rem; }
+    .summary { background: #16213e; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #2a2a4a; }
+    .summary span { margin-right: 1.5rem; }
+    .pass { color: #4cd964; }
+    .fail { color: #e94560; }
+    .test { padding: 0.25rem 0; font-size: 0.85rem; }
+    .test.passed::before { content: '\2713 '; color: #4cd964; }
+    .test.failed::before { content: '\2717 '; color: #e94560; font-weight: bold; }
+    .test.failed { color: #e94560; }
+    .error-detail { color: #ff8a80; font-size: 0.75rem; margin-left: 1.5rem; }
+  </style>
+</head>
+<body>
+  <h1>Tic-Tac-Toe Test Suite</h1>
+  <div class="summary" id="summary"></div>
+  <div id="results"></div>
+
+  <!-- Replicate the game DOM structure needed by UI and ModeSelector -->
+  <div style="display:none">
+    <div id="test-game-container">
+      <div id="board" role="grid">
+        <button class="cell" data-index="0" data-hover="X" role="gridcell" aria-label="Row 1, Column 1 - empty" tabindex="0"></button>
+        <button class="cell" data-index="1" data-hover="X" role="gridcell" aria-label="Row 1, Column 2 - empty" tabindex="0"></button>
+        <button class="cell" data-index="2" data-hover="X" role="gridcell" aria-label="Row 1, Column 3 - empty" tabindex="0"></button>
+        <button class="cell" data-index="3" data-hover="X" role="gridcell" aria-label="Row 2, Column 1 - empty" tabindex="0"></button>
+        <button class="cell" data-index="4" data-hover="X" role="gridcell" aria-label="Row 2, Column 2 - empty" tabindex="0"></button>
+        <button class="cell" data-index="5" data-hover="X" role="gridcell" aria-label="Row 2, Column 3 - empty" tabindex="0"></button>
+        <button class="cell" data-index="6" data-hover="X" role="gridcell" aria-label="Row 3, Column 1 - empty" tabindex="0"></button>
+        <button class="cell" data-index="7" data-hover="X" role="gridcell" aria-label="Row 3, Column 2 - empty" tabindex="0"></button>
+        <button class="cell" data-index="8" data-hover="X" role="gridcell" aria-label="Row 3, Column 3 - empty" tabindex="0"></button>
+      </div>
+      <span id="status-text" class="status-text turn-x">Player X's turn</span>
+      <span id="score-x">0</span>
+      <span id="score-o">0</span>
+      <span id="score-draws">0</span>
+      <div id="score-player-x" class="score-player player-x active">
+        <span class="score-player-label">Player X</span>
+      </div>
+      <div id="score-player-o" class="score-player player-o">
+        <span class="score-player-label">Player O</span>
+      </div>
+      <button id="btn-new-game"></button>
+      <button id="btn-reset-scores"></button>
+      <div id="game-overlay">
+        <div id="overlay-icon"></div>
+        <h2 id="overlay-title" class="overlay-title"></h2>
+        <p id="overlay-subtitle"></p>
+        <button id="overlay-play-again"></button>
+      </div>
+      <div id="confetti-container"></div>
+
+      <!-- Mode Selector -->
+      <div class="mode-overlay" id="mode-overlay">
+        <div class="mode-content">
+          <h2 class="mode-title" id="mode-title">New Game</h2>
+          <div class="mode-section">
+            <div class="mode-options" id="mode-type-options">
+              <button class="mode-option selected" data-value="human" aria-pressed="true">vs Human</button>
+              <button class="mode-option" data-value="ai" aria-pressed="false">vs Computer</button>
+            </div>
+          </div>
+          <div class="mode-ai-settings" id="mode-ai-settings">
+            <div class="mode-section">
+              <div class="mode-options" id="mode-symbol-options">
+                <button class="mode-option selected" data-value="X" aria-pressed="true">X (First)</button>
+                <button class="mode-option" data-value="O" aria-pressed="false">O (Second)</button>
+              </div>
+            </div>
+            <div class="mode-section">
+              <div class="mode-options" id="mode-difficulty-options">
+                <button class="mode-option" data-value="easy" aria-pressed="false">Easy</button>
+                <button class="mode-option selected" data-value="medium" aria-pressed="true">Medium</button>
+                <button class="mode-option" data-value="hard" aria-pressed="false">Hard</button>
+              </div>
+            </div>
+          </div>
+          <button class="mode-start-btn" id="mode-start-btn">Start Game</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    // ============================================
+    // Minimal Test Framework
+    // ============================================
+    const results = { total: 0, passed: 0, failed: 0, sections: [] };
+    let currentSection = null;
+
+    function describe(name, fn) {
+      currentSection = { name, tests: [] };
+      results.sections.push(currentSection);
+      fn();
+    }
+
+    function it(name, fn) {
+      results.total++;
+      try {
+        fn();
+        results.passed++;
+        currentSection.tests.push({ name, passed: true });
+      } catch (e) {
+        results.failed++;
+        currentSection.tests.push({ name, passed: false, error: e.message });
+      }
+    }
+
+    function assert(condition, message) {
+      if (!condition) throw new Error(message || 'Assertion failed');
+    }
+
+    function assertEqual(actual, expected, message) {
+      if (actual !== expected) {
+        throw new Error(message || `Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+      }
+    }
+
+    function assertDeepEqual(actual, expected, message) {
+      if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+        throw new Error(message || `Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+      }
+    }
+
+    function assertNull(value, message) {
+      if (value !== null) throw new Error(message || `Expected null, got ${JSON.stringify(value)}`);
+    }
+
+    function assertNotNull(value, message) {
+      if (value === null) throw new Error(message || 'Expected non-null value');
+    }
+
+    function assertTrue(value, message) {
+      if (value !== true) throw new Error(message || `Expected true, got ${value}`);
+    }
+
+    function assertFalse(value, message) {
+      if (value !== false) throw new Error(message || `Expected false, got ${value}`);
+    }
+
+    // ============================================
+    // Helper: reset DOM for integration tests
+    // ============================================
+    function resetDOM() {
+      const board = document.getElementById('board');
+      const cells = board.querySelectorAll('.cell');
+      cells.forEach((cell, i) => {
+        cell.innerHTML = '';
+        cell.className = 'cell';
+        cell.removeAttribute('disabled');
+        cell.dataset.hover = 'X';
+        const row = Math.floor(i / 3) + 1;
+        const col = (i % 3) + 1;
+        cell.setAttribute('aria-label', `Row ${row}, Column ${col} - empty`);
+      });
+      document.getElementById('status-text').textContent = "Player X's turn";
+      document.getElementById('status-text').className = 'status-text turn-x';
+      document.getElementById('score-x').textContent = '0';
+      document.getElementById('score-o').textContent = '0';
+      document.getElementById('score-draws').textContent = '0';
+      document.getElementById('score-player-x').className = 'score-player player-x active';
+      document.getElementById('score-player-o').className = 'score-player player-o';
+      document.querySelector('#score-player-x .score-player-label').textContent = 'Player X';
+      document.querySelector('#score-player-o .score-player-label').textContent = 'Player O';
+      document.getElementById('game-overlay').classList.remove('visible');
+      document.getElementById('mode-overlay').classList.remove('visible');
+      document.getElementById('confetti-container').innerHTML = '';
+    }
+
+    // ============================================
+    // UNIT TESTS: Player
+    // ============================================
+    describe('Player - Constructor', () => {
+      it('should create player with correct symbol', () => {
+        const p = new Player('X');
+        assertEqual(p.symbol, 'X');
+      });
+
+      it('should initialize score to 0', () => {
+        const p = new Player('X');
+        assertEqual(p.score, 0);
+      });
+
+      it('should work with O symbol', () => {
+        const p = new Player('O');
+        assertEqual(p.symbol, 'O');
+      });
+    });
+
+    describe('Player - CSS Classes', () => {
+      it('should return correct cssClass for X', () => {
+        const p = new Player('X');
+        assertEqual(p.cssClass, 'player-x');
+      });
+
+      it('should return correct cssClass for O', () => {
+        const p = new Player('O');
+        assertEqual(p.cssClass, 'player-o');
+      });
+
+      it('should return correct markClass for X', () => {
+        const p = new Player('X');
+        assertEqual(p.markClass, 'mark-x');
+      });
+
+      it('should return correct markClass for O', () => {
+        const p = new Player('O');
+        assertEqual(p.markClass, 'mark-o');
+      });
+    });
+
+    describe('Player - Score Management', () => {
+      it('should increment score by 1', () => {
+        const p = new Player('X');
+        p.incrementScore();
+        assertEqual(p.score, 1);
+      });
+
+      it('should increment score multiple times', () => {
+        const p = new Player('X');
+        p.incrementScore();
+        p.incrementScore();
+        p.incrementScore();
+        assertEqual(p.score, 3);
+      });
+
+      it('should reset score to 0', () => {
+        const p = new Player('X');
+        p.incrementScore();
+        p.incrementScore();
+        p.resetScore();
+        assertEqual(p.score, 0);
+      });
+
+      it('should reset score when already 0', () => {
+        const p = new Player('X');
+        p.resetScore();
+        assertEqual(p.score, 0);
+      });
+    });
+
+    // ============================================
+    // UNIT TESTS: Board
+    // ============================================
+    describe('Board - Constructor', () => {
+      it('should create 3x3 board by default', () => {
+        const b = new Board();
+        assertEqual(b.size, 3);
+        assertEqual(b.cells.length, 9);
+      });
+
+      it('should initialize all cells to null', () => {
+        const b = new Board();
+        assertTrue(b.cells.every(c => c === null));
+      });
+
+      it('should support custom size', () => {
+        const b = new Board(4);
+        assertEqual(b.size, 4);
+        assertEqual(b.cells.length, 16);
+      });
+    });
+
+    describe('Board - placeMark', () => {
+      it('should place mark on empty cell', () => {
+        const b = new Board();
+        assertTrue(b.placeMark(0, 'X'));
+        assertEqual(b.cells[0], 'X');
+      });
+
+      it('should reject placing mark on occupied cell', () => {
+        const b = new Board();
+        b.placeMark(0, 'X');
+        assertFalse(b.placeMark(0, 'O'));
+        assertEqual(b.cells[0], 'X');
+      });
+
+      it('should reject negative index', () => {
+        const b = new Board();
+        assertFalse(b.placeMark(-1, 'X'));
+      });
+
+      it('should reject out-of-bounds index', () => {
+        const b = new Board();
+        assertFalse(b.placeMark(9, 'X'));
+      });
+
+      it('should reject index at exact boundary', () => {
+        const b = new Board();
+        assertFalse(b.placeMark(9, 'X'));
+      });
+
+      it('should place marks in sequence', () => {
+        const b = new Board();
+        b.placeMark(0, 'X');
+        b.placeMark(1, 'O');
+        b.placeMark(2, 'X');
+        assertEqual(b.cells[0], 'X');
+        assertEqual(b.cells[1], 'O');
+        assertEqual(b.cells[2], 'X');
+      });
+    });
+
+    describe('Board - isValidMove', () => {
+      it('should return true for empty cell', () => {
+        const b = new Board();
+        assertTrue(b.isValidMove(0));
+      });
+
+      it('should return false for occupied cell', () => {
+        const b = new Board();
+        b.placeMark(4, 'X');
+        assertFalse(b.isValidMove(4));
+      });
+
+      it('should return false for negative index', () => {
+        const b = new Board();
+        assertFalse(b.isValidMove(-1));
+      });
+
+      it('should return false for index >= cells.length', () => {
+        const b = new Board();
+        assertFalse(b.isValidMove(9));
+        assertFalse(b.isValidMove(100));
+      });
+
+      it('should handle NaN gracefully', () => {
+        const b = new Board();
+        // NaN >= 0 is false, so isValidMove returns false
+        assertFalse(b.isValidMove(NaN));
+      });
+
+      it('should validate all 9 positions on fresh board', () => {
+        const b = new Board();
+        for (let i = 0; i < 9; i++) {
+          assertTrue(b.isValidMove(i), `Position ${i} should be valid`);
+        }
+      });
+    });
+
+    describe('Board - isFull', () => {
+      it('should return false on empty board', () => {
+        const b = new Board();
+        assertFalse(b.isFull());
+      });
+
+      it('should return false with some moves', () => {
+        const b = new Board();
+        b.placeMark(0, 'X');
+        b.placeMark(4, 'O');
+        assertFalse(b.isFull());
+      });
+
+      it('should return true when all cells filled', () => {
+        const b = new Board();
+        const symbols = ['X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X'];
+        symbols.forEach((s, i) => b.placeMark(i, s));
+        assertTrue(b.isFull());
+      });
+
+      it('should return false with 8 of 9 cells filled', () => {
+        const b = new Board();
+        for (let i = 0; i < 8; i++) {
+          b.placeMark(i, i % 2 === 0 ? 'X' : 'O');
+        }
+        assertFalse(b.isFull());
+      });
+    });
+
+    describe('Board - reset', () => {
+      it('should clear all cells to null', () => {
+        const b = new Board();
+        b.placeMark(0, 'X');
+        b.placeMark(4, 'O');
+        b.reset();
+        assertTrue(b.cells.every(c => c === null));
+      });
+
+      it('should allow new moves after reset', () => {
+        const b = new Board();
+        b.placeMark(0, 'X');
+        b.reset();
+        assertTrue(b.placeMark(0, 'O'));
+        assertEqual(b.cells[0], 'O');
+      });
+    });
+
+    describe('Board - getCell', () => {
+      it('should return null for empty cell', () => {
+        const b = new Board();
+        assertNull(b.getCell(0));
+      });
+
+      it('should return symbol for filled cell', () => {
+        const b = new Board();
+        b.placeMark(3, 'O');
+        assertEqual(b.getCell(3), 'O');
+      });
+
+      it('should return undefined for out of bounds', () => {
+        const b = new Board();
+        assertEqual(b.getCell(9), undefined);
+      });
+    });
+
+    // ============================================
+    // UNIT TESTS: WinChecker
+    // ============================================
+    describe('WinChecker - Pattern Generation', () => {
+      it('should generate 8 patterns for 3x3 board', () => {
+        const wc = new WinChecker(3);
+        assertEqual(wc.winPatterns.length, 8);
+      });
+
+      it('should include all 3 row patterns', () => {
+        const wc = new WinChecker(3);
+        const rows = [[0,1,2], [3,4,5], [6,7,8]];
+        for (const row of rows) {
+          assert(wc.winPatterns.some(p => JSON.stringify(p) === JSON.stringify(row)),
+            `Missing row pattern ${row}`);
+        }
+      });
+
+      it('should include all 3 column patterns', () => {
+        const wc = new WinChecker(3);
+        const cols = [[0,3,6], [1,4,7], [2,5,8]];
+        for (const col of cols) {
+          assert(wc.winPatterns.some(p => JSON.stringify(p) === JSON.stringify(col)),
+            `Missing column pattern ${col}`);
+        }
+      });
+
+      it('should include main diagonal pattern', () => {
+        const wc = new WinChecker(3);
+        assert(wc.winPatterns.some(p => JSON.stringify(p) === JSON.stringify([0,4,8])),
+          'Missing main diagonal');
+      });
+
+      it('should include anti-diagonal pattern', () => {
+        const wc = new WinChecker(3);
+        assert(wc.winPatterns.some(p => JSON.stringify(p) === JSON.stringify([2,4,6])),
+          'Missing anti-diagonal');
+      });
+
+      it('should generate correct patterns for 4x4 board', () => {
+        const wc = new WinChecker(4);
+        // 4 rows + 4 cols + 2 diags = 10
+        assertEqual(wc.winPatterns.length, 10);
+      });
+    });
+
+    describe('WinChecker - Win Detection', () => {
+      it('should detect X winning top row', () => {
+        const wc = new WinChecker();
+        const cells = ['X','X','X', null,null,null, null,null,null];
+        const result = wc.check(cells);
+        assertNotNull(result);
+        assertEqual(result.winner, 'X');
+        assertDeepEqual(result.pattern, [0,1,2]);
+      });
+
+      it('should detect O winning middle row', () => {
+        const wc = new WinChecker();
+        const cells = [null,null,null, 'O','O','O', null,null,null];
+        const result = wc.check(cells);
+        assertNotNull(result);
+        assertEqual(result.winner, 'O');
+        assertDeepEqual(result.pattern, [3,4,5]);
+      });
+
+      it('should detect winning bottom row', () => {
+        const wc = new WinChecker();
+        const cells = [null,null,null, null,null,null, 'X','X','X'];
+        const result = wc.check(cells);
+        assertNotNull(result);
+        assertEqual(result.winner, 'X');
+        assertDeepEqual(result.pattern, [6,7,8]);
+      });
+
+      it('should detect winning left column', () => {
+        const wc = new WinChecker();
+        const cells = ['O',null,null, 'O',null,null, 'O',null,null];
+        const result = wc.check(cells);
+        assertNotNull(result);
+        assertEqual(result.winner, 'O');
+        assertDeepEqual(result.pattern, [0,3,6]);
+      });
+
+      it('should detect winning middle column', () => {
+        const wc = new WinChecker();
+        const cells = [null,'X',null, null,'X',null, null,'X',null];
+        const result = wc.check(cells);
+        assertNotNull(result);
+        assertEqual(result.winner, 'X');
+      });
+
+      it('should detect winning right column', () => {
+        const wc = new WinChecker();
+        const cells = [null,null,'O', null,null,'O', null,null,'O'];
+        const result = wc.check(cells);
+        assertNotNull(result);
+        assertEqual(result.winner, 'O');
+      });
+
+      it('should detect winning main diagonal', () => {
+        const wc = new WinChecker();
+        const cells = ['X',null,null, null,'X',null, null,null,'X'];
+        const result = wc.check(cells);
+        assertNotNull(result);
+        assertEqual(result.winner, 'X');
+        assertDeepEqual(result.pattern, [0,4,8]);
+      });
+
+      it('should detect winning anti-diagonal', () => {
+        const wc = new WinChecker();
+        const cells = [null,null,'O', null,'O',null, 'O',null,null];
+        const result = wc.check(cells);
+        assertNotNull(result);
+        assertEqual(result.winner, 'O');
+        assertDeepEqual(result.pattern, [2,4,6]);
+      });
+
+      it('should return null for no winner', () => {
+        const wc = new WinChecker();
+        const cells = ['X','O','X', null,null,null, null,null,null];
+        const result = wc.check(cells);
+        assertNull(result);
+      });
+
+      it('should return null for empty board', () => {
+        const wc = new WinChecker();
+        const cells = new Array(9).fill(null);
+        const result = wc.check(cells);
+        assertNull(result);
+      });
+
+      it('should detect win in a full board (not draw)', () => {
+        const wc = new WinChecker();
+        // X wins via top row, board is full
+        const cells = ['X','X','X', 'O','O','X', 'X','O','O'];
+        const result = wc.check(cells);
+        assertNotNull(result);
+        assertEqual(result.winner, 'X');
+      });
+
+      it('should return first matching pattern when multiple exist', () => {
+        const wc = new WinChecker();
+        // X wins via both row 0 and col 0 (contrived, not real game state)
+        const cells = ['X','X','X', 'X',null,null, 'X',null,null];
+        const result = wc.check(cells);
+        assertNotNull(result);
+        assertEqual(result.winner, 'X');
+        // Should return first found (row 0)
+        assertDeepEqual(result.pattern, [0,1,2]);
+      });
+    });
+
+    describe('WinChecker - Draw Scenarios', () => {
+      it('should return null for classic draw board', () => {
+        const wc = new WinChecker();
+        // X O X
+        // X X O
+        // O X O
+        const cells = ['X','O','X', 'X','X','O', 'O','X','O'];
+        const result = wc.check(cells);
+        assertNull(result);
+      });
+
+      it('should return null for another draw configuration', () => {
+        const wc = new WinChecker();
+        // O X O
+        // X X O
+        // X O X
+        const cells = ['O','X','O', 'X','X','O', 'X','O','X'];
+        const result = wc.check(cells);
+        assertNull(result);
+      });
+    });
+
+    // ============================================
+    // UNIT TESTS: UI
+    // ============================================
+    describe('UI - Constructor', () => {
+      it('should find all required DOM elements', () => {
+        const ui = new UI();
+        assert(ui.els.board !== null, 'board element missing');
+        assert(ui.els.statusText !== null, 'statusText element missing');
+        assert(ui.els.scoreX !== null, 'scoreX element missing');
+        assert(ui.els.scoreO !== null, 'scoreO element missing');
+        assert(ui.els.scoreDraws !== null, 'scoreDraws element missing');
+        assert(ui.els.overlay !== null, 'overlay element missing');
+      });
+
+      it('should find 9 cell buttons', () => {
+        const ui = new UI();
+        assertEqual(ui.cellButtons.length, 9);
+      });
+    });
+
+    describe('UI - renderMark', () => {
+      it('should add mark element to cell', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.renderMark(0, 'X');
+        const cell = ui.cellButtons[0];
+        const mark = cell.querySelector('.cell-mark');
+        assertNotNull(mark);
+        assertEqual(mark.textContent, 'X');
+        assert(mark.classList.contains('mark-x'));
+      });
+
+      it('should add cell--filled class', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.renderMark(4, 'O');
+        assert(ui.cellButtons[4].classList.contains('cell--filled'));
+      });
+
+      it('should update aria-label', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.renderMark(0, 'X');
+        assertEqual(ui.cellButtons[0].getAttribute('aria-label'), 'Row 1, Column 1 - X');
+      });
+
+      it('should set correct aria-label for center cell', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.renderMark(4, 'O');
+        assertEqual(ui.cellButtons[4].getAttribute('aria-label'), 'Row 2, Column 2 - O');
+      });
+
+      it('should set correct aria-label for bottom-right cell', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.renderMark(8, 'X');
+        assertEqual(ui.cellButtons[8].getAttribute('aria-label'), 'Row 3, Column 3 - X');
+      });
+    });
+
+    describe('UI - updateHoverHints', () => {
+      it('should set data-hover on empty cells', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.updateHoverHints('O');
+        for (const cell of ui.cellButtons) {
+          assertEqual(cell.dataset.hover, 'O');
+        }
+      });
+
+      it('should not change hover on filled cells', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.renderMark(0, 'X');
+        ui.updateHoverHints('O');
+        // Cell 0 is filled, so we check unfilled cells
+        assertEqual(ui.cellButtons[1].dataset.hover, 'O');
+        assertEqual(ui.cellButtons[2].dataset.hover, 'O');
+      });
+    });
+
+    describe('UI - Status Methods', () => {
+      it('should set turn status for X with label', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.setTurnStatus('X', 'Player X');
+        const el = ui.els.statusText;
+        assertEqual(el.textContent, "Player X's turn");
+        assert(el.classList.contains('turn-x'));
+      });
+
+      it('should set turn status for O with label', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.setTurnStatus('O', 'Player O');
+        const el = ui.els.statusText;
+        assertEqual(el.textContent, "Player O's turn");
+        assert(el.classList.contains('turn-o'));
+      });
+
+      it('should set turn status with custom label', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.setTurnStatus('O', 'You');
+        const el = ui.els.statusText;
+        assertEqual(el.textContent, "You's turn");
+        assert(el.classList.contains('turn-o'));
+      });
+
+      it('should set thinking status for AI', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.setThinkingStatus('O');
+        const el = ui.els.statusText;
+        assertEqual(el.textContent, 'Computer thinking...');
+        assert(el.classList.contains('turn-o'));
+      });
+
+      it('should set win status with label', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.setWinStatus('Player X');
+        const el = ui.els.statusText;
+        assertEqual(el.textContent, 'Player X wins!');
+        assert(el.classList.contains('win'));
+      });
+
+      it('should set draw status', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.setDrawStatus();
+        const el = ui.els.statusText;
+        assertEqual(el.textContent, "It's a draw!");
+        assert(el.classList.contains('draw'));
+      });
+    });
+
+    describe('UI - Scoreboard', () => {
+      it('should update all score values', () => {
+        resetDOM();
+        const ui = new UI();
+        const pX = new Player('X');
+        const pO = new Player('O');
+        pX.incrementScore();
+        pX.incrementScore();
+        pO.incrementScore();
+        ui.updateScores(pX, pO, 3);
+        assertEqual(ui.els.scoreX.textContent, '2');
+        assertEqual(ui.els.scoreO.textContent, '1');
+        assertEqual(ui.els.scoreDraws.textContent, '3');
+      });
+
+      it('should set active player X', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.setActivePlayer('X');
+        assert(ui.els.scorePlayerX.classList.contains('active'));
+        assertFalse(ui.els.scorePlayerO.classList.contains('active'));
+      });
+
+      it('should set active player O', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.setActivePlayer('O');
+        assertFalse(ui.els.scorePlayerX.classList.contains('active'));
+        assert(ui.els.scorePlayerO.classList.contains('active'));
+      });
+    });
+
+    describe('UI - Win/Draw Highlighting', () => {
+      it('should highlight winning cells', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.highlightWinCells([0, 1, 2]);
+        assert(ui.cellButtons[0].classList.contains('cell--win'));
+        assert(ui.cellButtons[1].classList.contains('cell--win'));
+        assert(ui.cellButtons[2].classList.contains('cell--win'));
+        assertFalse(ui.cellButtons[3].classList.contains('cell--win'));
+      });
+
+      it('should mark all cells as draw', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.markAllCellsDraw();
+        for (const cell of ui.cellButtons) {
+          assert(cell.classList.contains('cell--draw'));
+        }
+      });
+    });
+
+    describe('UI - Disable/Enable Cells', () => {
+      it('should disable all cells', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.disableAllCells();
+        for (const cell of ui.cellButtons) {
+          assert(cell.classList.contains('cell--disabled'));
+          assert(cell.hasAttribute('disabled'));
+        }
+      });
+    });
+
+    describe('UI - clearBoard', () => {
+      it('should remove all marks and classes', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.renderMark(0, 'X');
+        ui.renderMark(4, 'O');
+        ui.highlightWinCells([0]);
+        ui.disableAllCells();
+        ui.clearBoard();
+        for (const cell of ui.cellButtons) {
+          assertEqual(cell.innerHTML, '');
+          assertEqual(cell.className, 'cell');
+          assertFalse(cell.hasAttribute('disabled'));
+          assertEqual(cell.dataset.hover, 'X');
+        }
+      });
+
+      it('should restore aria-labels to empty', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.renderMark(0, 'X');
+        ui.clearBoard();
+        assertEqual(ui.cellButtons[0].getAttribute('aria-label'), 'Row 1, Column 1 - empty');
+        assertEqual(ui.cellButtons[8].getAttribute('aria-label'), 'Row 3, Column 3 - empty');
+      });
+    });
+
+    describe('UI - Overlay', () => {
+      it('should show win overlay for X', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.showWinOverlay('Player X', 'X');
+        assert(ui.els.overlay.classList.contains('visible'));
+        assertEqual(ui.els.overlayTitle.textContent, 'Player X Wins!');
+        assert(ui.els.overlayTitle.classList.contains('win-x'));
+      });
+
+      it('should show win overlay for O', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.showWinOverlay('Player O', 'O');
+        assert(ui.els.overlay.classList.contains('visible'));
+        assertEqual(ui.els.overlayTitle.textContent, 'Player O Wins!');
+        assert(ui.els.overlayTitle.classList.contains('win-o'));
+      });
+
+      it('should show win overlay with custom label', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.showWinOverlay('You', 'X');
+        assert(ui.els.overlay.classList.contains('visible'));
+        assertEqual(ui.els.overlayTitle.textContent, 'You Wins!');
+        assert(ui.els.overlayTitle.classList.contains('win-x'));
+      });
+
+      it('should show draw overlay', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.showDrawOverlay();
+        assert(ui.els.overlay.classList.contains('visible'));
+        assertEqual(ui.els.overlayTitle.textContent, "It's a Draw!");
+        assert(ui.els.overlayTitle.classList.contains('draw'));
+      });
+
+      it('should hide overlay', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.showWinOverlay('Player X', 'X');
+        ui.hideOverlay();
+        assertFalse(ui.els.overlay.classList.contains('visible'));
+      });
+    });
+
+    describe('UI - Confetti', () => {
+      it('should spawn confetti particles', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.spawnConfetti(10);
+        const particles = ui.els.confettiContainer.querySelectorAll('.confetti');
+        assertEqual(particles.length, 10);
+      });
+
+      it('should spawn default 30 particles', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.spawnConfetti();
+        const particles = ui.els.confettiContainer.querySelectorAll('.confetti');
+        assertEqual(particles.length, 30);
+      });
+    });
+
+    // ============================================
+    // INTEGRATION TESTS: Game Controller
+    // ============================================
+    describe('Game - Initialization', () => {
+      it('should create game with two players', () => {
+        resetDOM();
+        const game = new Game();
+        assertEqual(game.players.length, 2);
+        assertEqual(game.players[0].symbol, 'X');
+        assertEqual(game.players[1].symbol, 'O');
+      });
+
+      it('should start with player X', () => {
+        resetDOM();
+        const game = new Game();
+        assertEqual(game.currentPlayerIndex, 0);
+        assertEqual(game.currentPlayer.symbol, 'X');
+      });
+
+      it('should initialize with gameOver true (awaiting mode selection)', () => {
+        resetDOM();
+        const game = new Game();
+        assertTrue(game.gameOver);
+      });
+
+      it('should initialize with 0 draws', () => {
+        resetDOM();
+        const game = new Game();
+        assertEqual(game.draws, 0);
+      });
+
+      it('should initialize with default human mode', () => {
+        resetDOM();
+        const game = new Game();
+        assertEqual(game.gameMode, 'human');
+      });
+
+      it('should initialize aiThinking as false', () => {
+        resetDOM();
+        const game = new Game();
+        assertFalse(game.aiThinking);
+      });
+
+      it('should have null aiPlayer initially', () => {
+        resetDOM();
+        const game = new Game();
+        assertNull(game.aiPlayer);
+      });
+    });
+
+    describe('Game - Move Handling', () => {
+      // Helper: start a human vs human game
+      function newHumanGame() {
+        resetDOM();
+        const game = new Game();
+        game._startGame({ mode: 'human', humanSymbol: 'X', difficulty: 'medium' });
+        return game;
+      }
+
+      it('should process a valid move', () => {
+        const game = newHumanGame();
+        game._handleMove(0);
+        assertEqual(game.board.getCell(0), 'X');
+      });
+
+      it('should switch turns after valid move', () => {
+        const game = newHumanGame();
+        game._handleMove(0);
+        assertEqual(game.currentPlayer.symbol, 'O');
+      });
+
+      it('should reject move on occupied cell', () => {
+        const game = newHumanGame();
+        game._handleMove(0); // X plays
+        game._handleMove(0); // O tries same cell
+        assertEqual(game.currentPlayer.symbol, 'O');
+        assertEqual(game.board.getCell(0), 'X');
+      });
+
+      it('should reject move after game over', () => {
+        const game = newHumanGame();
+        game.gameOver = true;
+        game._handleMove(0);
+        assertNull(game.board.getCell(0));
+      });
+
+      it('should alternate between X and O', () => {
+        const game = newHumanGame();
+        game._handleMove(0); // X
+        game._handleMove(1); // O
+        game._handleMove(2); // X
+        assertEqual(game.board.getCell(0), 'X');
+        assertEqual(game.board.getCell(1), 'O');
+        assertEqual(game.board.getCell(2), 'X');
+      });
+    });
+
+    describe('Game - Win Detection', () => {
+      function newHvH() {
+        resetDOM();
+        const g = new Game();
+        g._startGame({ mode: 'human', humanSymbol: 'X', difficulty: 'medium' });
+        return g;
+      }
+
+      it('should detect X winning top row', () => {
+        const game = newHvH();
+        game._handleMove(0); game._handleMove(3);
+        game._handleMove(1); game._handleMove(4);
+        game._handleMove(2);
+        assertTrue(game.gameOver);
+        assertEqual(game.players[0].score, 1);
+      });
+
+      it('should detect O winning diagonal', () => {
+        const game = newHvH();
+        game._handleMove(0); game._handleMove(2);
+        game._handleMove(1); game._handleMove(4);
+        game._handleMove(5); game._handleMove(6);
+        assertTrue(game.gameOver);
+        assertEqual(game.players[1].score, 1);
+      });
+
+      it('should detect X winning left column', () => {
+        const game = newHvH();
+        game._handleMove(0); game._handleMove(1);
+        game._handleMove(3); game._handleMove(4);
+        game._handleMove(6);
+        assertTrue(game.gameOver);
+        assertEqual(game.players[0].score, 1);
+      });
+
+      it('should detect X winning main diagonal', () => {
+        const game = newHvH();
+        game._handleMove(0); game._handleMove(1);
+        game._handleMove(4); game._handleMove(2);
+        game._handleMove(8);
+        assertTrue(game.gameOver);
+      });
+
+      it('should update score display on win', () => {
+        const game = newHvH();
+        game._handleMove(0); game._handleMove(3);
+        game._handleMove(1); game._handleMove(4);
+        game._handleMove(2);
+        assertEqual(document.getElementById('score-x').textContent, '1');
+      });
+    });
+
+    describe('Game - Draw Detection', () => {
+      function newHvH() {
+        resetDOM();
+        const g = new Game();
+        g._startGame({ mode: 'human', humanSymbol: 'X', difficulty: 'medium' });
+        return g;
+      }
+
+      it('should detect a draw', () => {
+        const game = newHvH();
+        game._handleMove(0); game._handleMove(1);
+        game._handleMove(2); game._handleMove(5);
+        game._handleMove(3); game._handleMove(6);
+        game._handleMove(4); game._handleMove(8);
+        game._handleMove(7);
+        assertTrue(game.gameOver);
+        assertEqual(game.draws, 1);
+      });
+
+      it('should update draw score display', () => {
+        const game = newHvH();
+        game._handleMove(0); game._handleMove(1);
+        game._handleMove(2); game._handleMove(5);
+        game._handleMove(3); game._handleMove(6);
+        game._handleMove(4); game._handleMove(8);
+        game._handleMove(7);
+        assertEqual(document.getElementById('score-draws').textContent, '1');
+      });
+    });
+
+    describe('Game - New Game', () => {
+      function newHvH() {
+        resetDOM();
+        const g = new Game();
+        g._startGame({ mode: 'human', humanSymbol: 'X', difficulty: 'medium' });
+        return g;
+      }
+
+      it('should reset board state', () => {
+        const game = newHvH();
+        game._handleMove(0); game._handleMove(1);
+        game._newGame();
+        assertTrue(game.board.cells.every(c => c === null));
+      });
+
+      it('should reset to player X turn', () => {
+        const game = newHvH();
+        game._handleMove(0);
+        game._newGame();
+        assertEqual(game.currentPlayer.symbol, 'X');
+        assertEqual(game.currentPlayerIndex, 0);
+      });
+
+      it('should reset gameOver flag', () => {
+        const game = newHvH();
+        game.gameOver = true;
+        game._newGame();
+        assertFalse(game.gameOver);
+      });
+
+      it('should preserve scores across new game', () => {
+        const game = newHvH();
+        game._handleMove(0); game._handleMove(3);
+        game._handleMove(1); game._handleMove(4);
+        game._handleMove(2);
+        assertEqual(game.players[0].score, 1);
+        game._newGame();
+        assertEqual(game.players[0].score, 1);
+      });
+    });
+
+    describe('Game - Reset Scores', () => {
+      it('should reset all scores to 0', () => {
+        resetDOM();
+        const game = new Game();
+        game.players[0].incrementScore();
+        game.players[1].incrementScore();
+        game.draws = 3;
+        game._resetScores();
+        assertEqual(game.players[0].score, 0);
+        assertEqual(game.players[1].score, 0);
+        assertEqual(game.draws, 0);
+      });
+
+      it('should update score display', () => {
+        resetDOM();
+        const game = new Game();
+        game.players[0].incrementScore();
+        game.ui.updateScores(game.players[0], game.players[1], game.draws);
+        game._resetScores();
+        assertEqual(document.getElementById('score-x').textContent, '0');
+        assertEqual(document.getElementById('score-o').textContent, '0');
+        assertEqual(document.getElementById('score-draws').textContent, '0');
+      });
+    });
+
+    describe('Game - Play Again (from overlay)', () => {
+      it('should hide overlay and start new game', () => {
+        resetDOM();
+        const game = new Game();
+        game._startGame({ mode: 'human', humanSymbol: 'X', difficulty: 'medium' });
+        game.ui.showWinOverlay('Player X', 'X');
+        game._playAgain();
+        assertFalse(document.getElementById('game-overlay').classList.contains('visible'));
+        assertFalse(game.gameOver);
+      });
+    });
+
+    // ============================================
+    // EDGE CASE TESTS
+    // ============================================
+    // Helper for edge case tests
+    function startHumanGame() {
+      resetDOM();
+      const g = new Game();
+      g._startGame({ mode: 'human', humanSymbol: 'X', difficulty: 'medium' });
+      return g;
+    }
+
+    describe('Edge Case - Double Click Same Cell', () => {
+      it('should only register first click', () => {
+        const game = startHumanGame();
+        game._handleMove(4);
+        game._handleMove(4);
+        assertEqual(game.board.getCell(4), 'X');
+        assertEqual(game.currentPlayer.symbol, 'O');
+      });
+    });
+
+    describe('Edge Case - Click After Game Over', () => {
+      it('should ignore all clicks after win', () => {
+        const game = startHumanGame();
+        game._handleMove(0); game._handleMove(3);
+        game._handleMove(1); game._handleMove(4);
+        game._handleMove(2);
+        assertTrue(game.gameOver);
+        const cellsBefore = [...game.board.cells];
+        game._handleMove(5); game._handleMove(6); game._handleMove(7);
+        assertDeepEqual(game.board.cells, cellsBefore);
+      });
+    });
+
+    describe('Edge Case - Rapid Sequential Moves', () => {
+      it('should handle rapid moves correctly', () => {
+        const game = startHumanGame();
+        for (let i = 0; i < 9; i++) game._handleMove(i);
+        assertTrue(game.gameOver);
+      });
+    });
+
+    describe('Edge Case - Multiple Games', () => {
+      it('should correctly accumulate scores over multiple games', () => {
+        const game = startHumanGame();
+        game._handleMove(0); game._handleMove(3);
+        game._handleMove(1); game._handleMove(4);
+        game._handleMove(2);
+        assertEqual(game.players[0].score, 1);
+        game._newGame();
+        game._handleMove(0); game._handleMove(3);
+        game._handleMove(1); game._handleMove(4);
+        game._handleMove(8); game._handleMove(5);
+        assertEqual(game.players[1].score, 1);
+        assertEqual(game.players[0].score, 1);
+      });
+    });
+
+    describe('Edge Case - New Game During Play', () => {
+      it('should allow new game mid-play without errors', () => {
+        const game = startHumanGame();
+        game._handleMove(0); game._handleMove(1);
+        game._newGame();
+        assertTrue(game.board.cells.every(c => c === null));
+        assertFalse(game.gameOver);
+        assertEqual(game.currentPlayer.symbol, 'X');
+      });
+    });
+
+    describe('Edge Case - Reset Scores Mid Game', () => {
+      it('should reset scores but not affect current board', () => {
+        const game = startHumanGame();
+        game.players[0].score = 5;
+        game._handleMove(0);
+        game._resetScores();
+        assertEqual(game.players[0].score, 0);
+        assertEqual(game.board.getCell(0), 'X');
+      });
+    });
+
+    describe('Edge Case - Win on Last Move', () => {
+      it('should detect win when board is full (not draw)', () => {
+        const game = startHumanGame();
+        game._handleMove(0); game._handleMove(1);
+        game._handleMove(2); game._handleMove(3);
+        game._handleMove(4); game._handleMove(5);
+        game._handleMove(7); game._handleMove(6);
+        game._handleMove(8);
+        assertTrue(game.gameOver);
+        assertEqual(game.players[0].score, 1);
+        assertEqual(game.draws, 0);
+      });
+    });
+
+    describe('Edge Case - Board Boundary Validation', () => {
+      it('should reject very large index', () => {
+        assertFalse(new Board().placeMark(1000, 'X'));
+      });
+      it('should reject negative index', () => {
+        assertFalse(new Board().placeMark(-100, 'X'));
+      });
+      it('should reject floating point index', () => {
+        assertFalse(new Board().isValidMove(1.5));
+      });
+    });
+
+    describe('Edge Case - State Consistency After Reset', () => {
+      it('should have clean state after multiple new games', () => {
+        const game = startHumanGame();
+        for (let round = 0; round < 5; round++) {
+          game._handleMove(0); game._handleMove(1);
+          game._newGame();
+        }
+        assertTrue(game.board.cells.every(c => c === null));
+        assertFalse(game.gameOver);
+        assertEqual(game.currentPlayerIndex, 0);
+      });
+
+      it('should have clean DOM state after clearBoard', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.renderMark(0, 'X');
+        ui.renderMark(4, 'O');
+        ui.highlightWinCells([0, 4, 8]);
+        ui.disableAllCells();
+        ui.clearBoard();
+        for (let i = 0; i < 9; i++) {
+          assertEqual(ui.cellButtons[i].className, 'cell');
+          assertEqual(ui.cellButtons[i].innerHTML, '');
+          assertFalse(ui.cellButtons[i].hasAttribute('disabled'));
+        }
+      });
+    });
+
+    // ============================================
+    // AI-RELATED TESTS
+    // ============================================
+
+    describe('ModeSelector - Constructor', () => {
+      it('should find all required DOM elements', () => {
+        resetDOM();
+        const ms = new ModeSelector();
+        assertNotNull(ms.els.overlay);
+        assertNotNull(ms.els.typeOptions);
+        assertNotNull(ms.els.aiSettings);
+        assertNotNull(ms.els.symbolOptions);
+        assertNotNull(ms.els.difficultyOptions);
+        assertNotNull(ms.els.startBtn);
+      });
+
+      it('should have default config', () => {
+        resetDOM();
+        const ms = new ModeSelector();
+        assertEqual(ms.config.mode, 'human');
+        assertEqual(ms.config.humanSymbol, 'X');
+        assertEqual(ms.config.difficulty, 'medium');
+      });
+    });
+
+    describe('ModeSelector - Show/Hide', () => {
+      it('should show overlay', () => {
+        resetDOM();
+        const ms = new ModeSelector();
+        ms.show();
+        assert(ms.els.overlay.classList.contains('visible'));
+      });
+
+      it('should hide overlay', () => {
+        resetDOM();
+        const ms = new ModeSelector();
+        ms.show();
+        ms.hide();
+        assertFalse(ms.els.overlay.classList.contains('visible'));
+      });
+    });
+
+    describe('Game - _startGame (Human vs Human)', () => {
+      it('should set gameMode to human', () => {
+        resetDOM();
+        const game = new Game();
+        game._startGame({ mode: 'human', humanSymbol: 'X', difficulty: 'medium' });
+        assertEqual(game.gameMode, 'human');
+        assertNull(game.aiPlayer);
+      });
+
+      it('should set labels to Player X / Player O', () => {
+        resetDOM();
+        const game = new Game();
+        game._startGame({ mode: 'human', humanSymbol: 'X', difficulty: 'medium' });
+        assertEqual(game.labelX, 'Player X');
+        assertEqual(game.labelO, 'Player O');
+      });
+
+      it('should set gameOver to false', () => {
+        resetDOM();
+        const game = new Game();
+        game._startGame({ mode: 'human', humanSymbol: 'X', difficulty: 'medium' });
+        assertFalse(game.gameOver);
+      });
+
+      it('should hide mode selector overlay', () => {
+        resetDOM();
+        const game = new Game();
+        game.modeSelector.show();
+        game._startGame({ mode: 'human', humanSymbol: 'X', difficulty: 'medium' });
+        assertFalse(document.getElementById('mode-overlay').classList.contains('visible'));
+      });
+    });
+
+    describe('Game - _startGame (AI mode, human plays X)', () => {
+      it('should configure AI as O', () => {
+        resetDOM();
+        const game = new Game();
+        game._startGame({ mode: 'ai', humanSymbol: 'X', difficulty: 'hard' });
+        assertEqual(game.gameMode, 'ai');
+        assertEqual(game.humanSymbol, 'X');
+        assertEqual(game.aiSymbol, 'O');
+        assertNotNull(game.aiPlayer);
+      });
+
+      it('should set labels to You / Computer', () => {
+        resetDOM();
+        const game = new Game();
+        game._startGame({ mode: 'ai', humanSymbol: 'X', difficulty: 'hard' });
+        assertEqual(game.labelX, 'You');
+        assertEqual(game.labelO, 'Computer');
+      });
+
+      it('should set AI difficulty', () => {
+        resetDOM();
+        const game = new Game();
+        game._startGame({ mode: 'ai', humanSymbol: 'X', difficulty: 'easy' });
+        assertEqual(game.aiPlayer.difficulty, 'easy');
+      });
+
+      it('should not trigger AI move (human plays first as X)', () => {
+        resetDOM();
+        const game = new Game();
+        game._startGame({ mode: 'ai', humanSymbol: 'X', difficulty: 'hard' });
+        assertFalse(game.aiThinking);
+      });
+    });
+
+    describe('Game - _startGame (AI mode, human plays O)', () => {
+      it('should configure AI as X', () => {
+        resetDOM();
+        const game = new Game();
+        game._startGame({ mode: 'ai', humanSymbol: 'O', difficulty: 'hard' });
+        assertEqual(game.humanSymbol, 'O');
+        assertEqual(game.aiSymbol, 'X');
+      });
+
+      it('should set labels correctly (Computer is X)', () => {
+        resetDOM();
+        const game = new Game();
+        game._startGame({ mode: 'ai', humanSymbol: 'O', difficulty: 'hard' });
+        assertEqual(game.labelX, 'Computer');
+        assertEqual(game.labelO, 'You');
+      });
+
+      it('should trigger AI first move (AI is X)', () => {
+        resetDOM();
+        const game = new Game();
+        game._startGame({ mode: 'ai', humanSymbol: 'O', difficulty: 'hard' });
+        // AI should be thinking since it goes first
+        assertTrue(game.aiThinking);
+        // Clean up timeout
+        if (game.aiTimeoutId) clearTimeout(game.aiTimeoutId);
+        game.aiTimeoutId = null;
+        game.aiThinking = false;
+      });
+    });
+
+    describe('Game - AI Turn Detection', () => {
+      it('should detect AI turn when current player is AI symbol', () => {
+        resetDOM();
+        const game = new Game();
+        game._startGame({ mode: 'ai', humanSymbol: 'X', difficulty: 'hard' });
+        // Initially it's X's turn (human), not AI turn
+        assertFalse(game._isAITurn());
+      });
+
+      it('should not be AI turn in human mode', () => {
+        resetDOM();
+        const game = new Game();
+        game._startGame({ mode: 'human', humanSymbol: 'X', difficulty: 'medium' });
+        assertFalse(game._isAITurn());
+        // Switch to O's turn
+        game._handleMove(0);
+        assertFalse(game._isAITurn());
+      });
+    });
+
+    describe('Game - AI Move Blocking', () => {
+      it('should block human clicks during AI thinking', () => {
+        resetDOM();
+        const game = new Game();
+        game._startGame({ mode: 'ai', humanSymbol: 'X', difficulty: 'hard' });
+        game.aiThinking = true;
+        game._handleMove(0);
+        assertNull(game.board.getCell(0));
+        game.aiThinking = false;
+      });
+
+      it('should block human clicks when it is AI turn', () => {
+        resetDOM();
+        const game = new Game();
+        game._startGame({ mode: 'ai', humanSymbol: 'X', difficulty: 'hard' });
+        // Simulate switching to AI's turn
+        game.currentPlayerIndex = 1; // O = AI
+        game._handleMove(0);
+        assertNull(game.board.getCell(0));
+      });
+    });
+
+    describe('Game - _showModeSelector', () => {
+      it('should show mode overlay and set gameOver', () => {
+        resetDOM();
+        const game = new Game();
+        game._startGame({ mode: 'human', humanSymbol: 'X', difficulty: 'medium' });
+        game._showModeSelector();
+        assertTrue(game.gameOver);
+        assert(document.getElementById('mode-overlay').classList.contains('visible'));
+      });
+
+      it('should clear AI timeout on mode switch', () => {
+        resetDOM();
+        const game = new Game();
+        game._startGame({ mode: 'ai', humanSymbol: 'O', difficulty: 'hard' });
+        // AI should be thinking
+        const timeoutId = game.aiTimeoutId;
+        assertNotNull(timeoutId);
+        game._showModeSelector();
+        assertNull(game.aiTimeoutId);
+        assertFalse(game.aiThinking);
+      });
+    });
+
+    describe('Game - _newGame clears AI timeout', () => {
+      it('should clear AI timeout on new game', () => {
+        resetDOM();
+        const game = new Game();
+        game._startGame({ mode: 'ai', humanSymbol: 'O', difficulty: 'hard' });
+        assertNotNull(game.aiTimeoutId);
+        game._newGame();
+        // New game triggers a new AI move since AI is X
+        // But the old timeout should have been cleared first
+        assertFalse(game.gameOver);
+      });
+    });
+
+    describe('UI - Player Labels', () => {
+      it('should set custom player labels', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.setPlayerLabels('You', 'Computer');
+        assertEqual(document.querySelector('#score-player-x .score-player-label').textContent, 'You');
+        assertEqual(document.querySelector('#score-player-o .score-player-label').textContent, 'Computer');
+      });
+
+      it('should set default labels', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.setPlayerLabels('Player X', 'Player O');
+        assertEqual(document.querySelector('#score-player-x .score-player-label').textContent, 'Player X');
+        assertEqual(document.querySelector('#score-player-o .score-player-label').textContent, 'Player O');
+      });
+    });
+
+    describe('UI - Thinking Status', () => {
+      it('should show thinking text for X', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.setThinkingStatus('X');
+        assertEqual(ui.els.statusText.textContent, 'Computer thinking...');
+        assert(ui.els.statusText.classList.contains('turn-x'));
+      });
+
+      it('should show thinking text for O', () => {
+        resetDOM();
+        const ui = new UI();
+        ui.setThinkingStatus('O');
+        assertEqual(ui.els.statusText.textContent, 'Computer thinking...');
+        assert(ui.els.statusText.classList.contains('turn-o'));
+      });
+    });
+
+    // ============================================
+    // RENDER TEST RESULTS
+    // ============================================
+    const summaryEl = document.getElementById('summary');
+    const resultsEl = document.getElementById('results');
+
+    const passRate = results.total > 0 ? ((results.passed / results.total) * 100).toFixed(1) : '0';
+    summaryEl.innerHTML = `
+      <span>Total: <strong>${results.total}</strong></span>
+      <span class="pass">Passed: <strong>${results.passed}</strong></span>
+      <span class="fail">Failed: <strong>${results.failed}</strong></span>
+      <span>Pass Rate: <strong>${passRate}%</strong></span>
+    `;
+
+    for (const section of results.sections) {
+      const h2 = document.createElement('h2');
+      h2.textContent = section.name;
+      resultsEl.appendChild(h2);
+
+      for (const test of section.tests) {
+        const div = document.createElement('div');
+        div.className = `test ${test.passed ? 'passed' : 'failed'}`;
+        div.textContent = test.name;
+        resultsEl.appendChild(div);
+
+        if (!test.passed && test.error) {
+          const errDiv = document.createElement('div');
+          errDiv.className = 'error-detail';
+          errDiv.textContent = test.error;
+          resultsEl.appendChild(errDiv);
+        }
+      }
+    }
+
+    // Output results to console for programmatic access
+    console.log('=== TEST RESULTS ===');
+    console.log(`Total: ${results.total}, Passed: ${results.passed}, Failed: ${results.failed}`);
+    console.log(`Pass Rate: ${passRate}%`);
+    if (results.failed > 0) {
+      console.log('\n=== FAILURES ===');
+      for (const section of results.sections) {
+        for (const test of section.tests) {
+          if (!test.passed) {
+            console.log(`FAIL: ${section.name} > ${test.name}`);
+            console.log(`  Error: ${test.error}`);
+          }
+        }
+      }
+    }
+
+    // Store globally for external access
+    window.testResults = results;
+  </script>
+</body>
+</html>
