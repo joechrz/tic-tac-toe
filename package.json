@@ -1,0 +1,35 @@
+{
+  "name": "tic-tac-toe-game",
+  "version": "1.0.0",
+  "description": "Modern Tic-Tac-Toe game with AI opponent built with TypeScript",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "build:css": "lessc styles/main.less styles/main.css --clean-css"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.7.0",
+    "less": "^4.2.0",
+    "less-plugin-clean-css": "^1.5.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.4.21"
+  },
+  "keywords": [
+    "tic-tac-toe",
+    "game",
+    "typescript",
+    "ai",
+    "minimax",
+    "less"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  }
+}

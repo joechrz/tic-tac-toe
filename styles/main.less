@@ -1,0 +1,63 @@
+// ============================================
+// Main LESS Entry Point
+// Tic-Tac-Toe Game Styles
+// ============================================
+
+// 1. Import Variables & Design Tokens
+@import 'variables';
+
+// 2. Import Reset & Base Styles
+@import 'reset';
+
+// 3. Import Layout System
+@import 'layout';
+
+// 4. Import Component Styles
+@import 'scoreboard';
+@import 'board';
+@import 'setup';
+
+// 5. Import Animations
+@import 'animations';
+
+// 6. Import Responsive Styles (must be last)
+@import 'responsive';
+
+// ============================================
+// Additional Global Utilities
+// ============================================
+
+// Focus styles for accessibility
+*:focus-visible {
+    outline: 3px solid @color-player-o;
+    outline-offset: 2px;
+    border-radius: @radius-sm;
+}
+
+// Smooth scrolling
+html {
+    scroll-behavior: smooth;
+}
+
+// Selection colors
+::selection {
+    background: fade(@color-player-x, 30%);
+    color: @color-text-primary;
+}
+
+// Button reset
+button {
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+}
+
+// Link styles (if needed)
+a {
+    color: @color-player-o;
+    text-decoration: none;
+    transition: color @transition-base;
+
+    &:hover {
+        color: @color-player-x;
+    }
+}

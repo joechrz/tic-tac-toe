@@ -1,0 +1,128 @@
+// ============================================
+// Layout & Grid System
+// ============================================
+
+.game-container {
+    position: relative;
+    z-index: @z-board;
+    width: 100%;
+    max-width: 1200px;
+    padding: @space-xl;
+}
+
+.game-wrapper {
+    display: flex;
+    gap: @space-2xl;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.game-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: @space-xl;
+    max-width: 1000px;
+}
+
+.game-header {
+    text-align: center;
+}
+
+.game-title {
+    font-size: @font-size-3xl;
+    font-weight: 800;
+    font-family: @font-display;
+    background: linear-gradient(135deg, @color-player-x, @color-player-o);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: @space-sm;
+}
+
+.turn-indicator {
+    font-size: @font-size-lg;
+    color: @color-text-secondary;
+    font-weight: 600;
+    min-height: 2rem;
+
+    span {
+        display: inline-block;
+        animation: fadeIn 300ms ease;
+    }
+
+    &.player-turn {
+        color: @color-player-x;
+    }
+
+    &.computer-turn {
+        color: @color-player-o;
+    }
+}
+
+.game-status {
+    text-align: center;
+    font-size: @font-size-xl;
+    font-weight: 700;
+    min-height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.win {
+        color: @color-win;
+        animation: pulse 1s ease infinite;
+    }
+
+    &.draw {
+        color: @color-draw;
+    }
+}
+
+.game-controls {
+    display: flex;
+    gap: @space-md;
+    justify-content: center;
+}
+
+.control-btn {
+    padding: @space-md @space-xl;
+    background: @color-bg-card;
+    color: @color-text-primary;
+    border: 2px solid @color-border;
+    border-radius: @radius-lg;
+    font-size: @font-size-base;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all @transition-base;
+
+    &:hover {
+        background: @color-bg-secondary;
+        border-color: @color-border-light;
+        transform: translateY(-2px);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}

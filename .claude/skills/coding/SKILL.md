@@ -6,10 +6,11 @@ allowed-tools: Read, Grep, Glob
 # Coding Agent Skill
 
 ## Role
-Software engineer responsible for implementing clean, maintainable, and well-architected code using OOP best practices.
+Software engineer responsible for implementing clean, maintainable, and well-architected frontend code using functional programming, OOP, and other Javascript best practices.
 
 ## Expertise
 - Object-Oriented Programming (OOP)
+- Functional Programming
 - Design patterns and SOLID principles
 - Clean code architecture
 - Event-driven programming
@@ -24,8 +25,9 @@ Software engineer responsible for implementing clean, maintainable, and well-arc
    - Board state management
    - UI controller
    - Event handlers
-3. Use OOP principles:
-   - Encapsulation
+3. Use React Best practices:
+   - Functional components
+   - Hooks
    - Single Responsibility Principle
    - Open/Closed Principle
 4. Implement robust game rules:
@@ -35,8 +37,9 @@ Software engineer responsible for implementing clean, maintainable, and well-arc
    - Invalid move prevention
 
 ## Architecture Approach
-- **Model-View-Controller (MVC)** or similar pattern
-- **Classes/Modules:**
+- React-based UI
+- Redux-based state management
+- **Components/Modules:**
   - `Game` - Main game controller
   - `Board` - Board state and logic
   - `Player` - Player representation
@@ -52,13 +55,14 @@ Software engineer responsible for implementing clean, maintainable, and well-arc
 - Event delegation for performance
 
 ## Deliverables
-- Well-structured JavaScript/TypeScript code
+- Well-structured TypeScript code
 - Modular file organization (if using separate files)
 - Clean integration with HTML/CSS from DesignAgent
 - Extensible architecture for future features
 
 ## Technology Stack
-- Vanilla JavaScript (ES6+) or TypeScript
-- No framework dependencies
-- Module pattern or ES6 classes
+- TypeScript
+- React
+- Redux
+- Module pattern
 - Event-driven architecture

@@ -1,0 +1,270 @@
+// ============================================
+// Responsive Design & Media Queries
+// ============================================
+
+// Mobile devices (portrait)
+@media (max-width: @breakpoint-md) {
+    .game-wrapper {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .scoreboard {
+        width: 100%;
+        max-width: 450px;
+        flex-direction: row;
+        justify-content: space-around;
+        padding: @space-lg;
+
+        h2 {
+            display: none;
+        }
+    }
+
+    .score-items {
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .score-item {
+        flex-direction: column;
+        text-align: center;
+        flex: 1;
+
+        &.player-score,
+        &.computer-score,
+        &.draw-score {
+            border-left: none;
+            border-bottom: 3px solid;
+        }
+
+        &.player-score {
+            border-bottom-color: @color-player-x;
+        }
+
+        &.computer-score {
+            border-bottom-color: @color-player-o;
+        }
+
+        &.draw-score {
+            border-bottom-color: @color-draw;
+        }
+    }
+
+    .score-label {
+        flex-direction: column;
+        gap: @space-xs;
+    }
+
+    .score-value {
+        text-align: center;
+    }
+
+    .reset-scores-btn,
+    .new-setup-btn {
+        display: none;
+    }
+
+    .game-controls {
+        flex-direction: column;
+        width: 100%;
+        max-width: 450px;
+    }
+
+    .control-btn {
+        width: 100%;
+    }
+}
+
+// Small mobile devices
+@media (max-width: @breakpoint-sm) {
+    body {
+        padding: @space-md;
+    }
+
+    .game-container {
+        padding: @space-md;
+    }
+
+    .game-title {
+        font-size: @font-size-2xl;
+    }
+
+    .turn-indicator {
+        font-size: @font-size-base;
+    }
+
+    .board {
+        gap: @space-sm;
+        padding: @space-md;
+    }
+
+    .cell {
+        font-size: clamp(1.5rem, 6vw, 3rem);
+    }
+
+    .modal-content {
+        padding: @space-xl;
+
+        h1 {
+            font-size: @font-size-2xl;
+        }
+    }
+
+    .symbol-btn,
+    .first-btn {
+        padding: @space-md;
+    }
+
+    .score-items {
+        gap: @space-sm;
+    }
+
+    .score-item {
+        padding: @space-sm;
+    }
+
+    .score-icon {
+        font-size: @font-size-lg;
+    }
+
+    .score-value {
+        font-size: @font-size-xl;
+    }
+}
+
+// Tablet and larger
+@media (min-width: @breakpoint-md) {
+    .scoreboard {
+        .reset-scores-btn {
+            margin-top: auto;
+        }
+    }
+
+    .game-wrapper {
+        min-height: 600px;
+    }
+}
+
+// Large screens
+@media (min-width: @breakpoint-lg) {
+    .game-container {
+        max-width: 1400px;
+    }
+
+    .board {
+        max-width: 950px;
+        gap: 0.5rem;
+    }
+
+    .scoreboard {
+        min-width: 250px;
+        padding: @space-2xl;
+    }
+}
+
+// Landscape orientation (mobile)
+@media (max-height: 700px) and (orientation: landscape) {
+    body {
+        justify-content: flex-start;
+        padding: @space-sm;
+    }
+
+    .game-container {
+        padding: @space-sm;
+    }
+
+    .game-wrapper {
+        flex-direction: row;
+        gap: @space-lg;
+    }
+
+    .scoreboard {
+        min-width: 150px;
+        padding: @space-md;
+
+        h2 {
+            font-size: @font-size-base;
+        }
+    }
+
+    .score-items {
+        gap: @space-sm;
+    }
+
+    .score-item {
+        padding: @space-sm;
+    }
+
+    .board {
+        max-width: 350px;
+        padding: @space-sm;
+    }
+
+    .game-title {
+        font-size: @font-size-xl;
+        margin-bottom: @space-xs;
+    }
+
+    .turn-indicator {
+        font-size: @font-size-sm;
+    }
+
+    .modal-content {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+}
+
+// Prefers reduced motion
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+// Dark mode support (optional enhancement)
+@media (prefers-color-scheme: light) {
+    // Could add light mode variables here if desired
+    // For now, keeping dark theme as default
+}
+
+// High contrast mode
+@media (prefers-contrast: high) {
+    .cell {
+        border: 2px solid @color-border-light;
+    }
+
+    .score-item {
+        border: 2px solid @color-border;
+    }
+
+    .symbol-btn,
+    .first-btn {
+        border-width: 3px;
+    }
+}
+
+// Touch device optimizations
+@media (hover: none) and (pointer: coarse) {
+    .cell,
+    .control-btn,
+    .symbol-btn,
+    .first-btn,
+    .start-btn {
+        // Larger touch targets
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    // Disable hover effects on touch devices
+    .cell:hover:not(.filled):not(.disabled) {
+        background: @color-bg-secondary;
+        transform: none;
+    }
+}

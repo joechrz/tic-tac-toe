@@ -10,12 +10,13 @@ One of the player for this game is the computer.  Let the user choose whether th
    - Clear visual feedback for game states (win, draw, player turns)
    - Modern color scheme and typography
    - Mobile-friendly design
+   - LESS-based CSS
 
 2. **CodingAgent** - code & implements the game using best OOP practices:
    - Clean separation of concerns (Game logic, UI, State management)
    - Modular, reusable components
    - Event-driven architecture
-   - Pure JavaScript (no framework dependencies unless specified)
+   - Typescript
 
 3. **CriticAgent** - as an expert architect and engineering critic, reviews all design and code for:
    - Modularity and separation of concerns

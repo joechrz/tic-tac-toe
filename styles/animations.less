@@ -1,0 +1,162 @@
+// ============================================
+// Animation Definitions
+// ============================================
+
+// Fade in animation
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+// Slide up animation
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// Pop in animation for marks
+@keyframes popIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3) rotate(-15deg);
+    }
+    60% {
+        transform: scale(1.15) rotate(5deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+// Win pulse animation
+@keyframes winPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.08);
+        opacity: 0.8;
+    }
+}
+
+// Win border animation
+@keyframes winBorder {
+    0%, 100% {
+        opacity: 1;
+        border-color: @color-win;
+    }
+    50% {
+        opacity: 0.5;
+        border-color: fade(@color-win, 50%);
+    }
+}
+
+// Pulse animation for text
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.05);
+    }
+}
+
+// Shake animation for invalid moves
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+// Bounce in animation
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+// Spin animation
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+// Glow animation
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 0 5px fade(@color-player-x, 30%),
+                    0 0 10px fade(@color-player-o, 30%);
+    }
+    50% {
+        box-shadow: 0 0 20px fade(@color-player-x, 50%),
+                    0 0 30px fade(@color-player-o, 50%);
+    }
+}
+
+// Utility animation classes
+.animate-fade-in {
+    animation: fadeIn 300ms ease;
+}
+
+.animate-slide-up {
+    animation: slideUp 400ms ease;
+}
+
+.animate-pop-in {
+    animation: popIn 500ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-pulse {
+    animation: pulse 1s ease infinite;
+}
+
+.animate-shake {
+    animation: shake 400ms ease;
+}
+
+.animate-bounce-in {
+    animation: bounceIn 600ms ease;
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+.animate-glow {
+    animation: glow 2s ease infinite;
+}

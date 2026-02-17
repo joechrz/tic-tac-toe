@@ -1,0 +1,125 @@
+// ============================================
+// Scoreboard Styles (Left Side)
+// ============================================
+
+.scoreboard {
+    background: @color-bg-card;
+    border-radius: @radius-xl;
+    padding: @space-xl;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: @space-lg;
+    box-shadow: @shadow-lg;
+    border: 1px solid @color-border;
+
+    h2 {
+        font-size: @font-size-xl;
+        font-weight: 700;
+        text-align: center;
+        color: @color-text-primary;
+        margin-bottom: @space-sm;
+    }
+}
+
+.score-items {
+    display: flex;
+    flex-direction: column;
+    gap: @space-md;
+}
+
+.score-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: @space-md;
+    background: @color-bg-secondary;
+    border-radius: @radius-md;
+    transition: all @transition-base;
+
+    &.player-score {
+        border-left: 4px solid @color-player-x;
+    }
+
+    &.computer-score {
+        border-left: 4px solid @color-player-o;
+    }
+
+    &.draw-score {
+        border-left: 4px solid @color-draw;
+    }
+
+    &.active {
+        background: fade(@color-bg-primary, 50%);
+        box-shadow: 0 0 20px fade(@color-player-x, 20%);
+    }
+}
+
+.score-label {
+    display: flex;
+    align-items: center;
+    gap: @space-sm;
+    font-size: @font-size-sm;
+    font-weight: 600;
+    color: @color-text-secondary;
+}
+
+.score-icon {
+    font-size: @font-size-xl;
+    font-weight: 800;
+    line-height: 1;
+
+    .player-score & {
+        color: @color-player-x;
+    }
+
+    .computer-score & {
+        color: @color-player-o;
+    }
+
+    .draw-score & {
+        color: @color-draw;
+    }
+}
+
+.score-value {
+    font-size: @font-size-2xl;
+    font-weight: 800;
+    color: @color-text-primary;
+    min-width: 2.5rem;
+    text-align: right;
+}
+
+.reset-scores-btn,
+.new-setup-btn {
+    padding: @space-md;
+    background: @color-bg-secondary;
+    color: @color-text-secondary;
+    border: 1px solid @color-border;
+    border-radius: @radius-md;
+    font-size: @font-size-sm;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all @transition-base;
+
+    &:hover {
+        background: @color-bg-primary;
+        color: @color-text-primary;
+        border-color: @color-border-light;
+    }
+
+    &:active {
+        transform: scale(0.98);
+    }
+}
+
+.new-setup-btn {
+    background: linear-gradient(135deg, @color-player-x, @color-player-o);
+    color: @color-text-primary;
+    border: none;
+
+    &:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+    }
+}

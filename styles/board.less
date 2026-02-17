@@ -1,0 +1,119 @@
+// ============================================
+// Game Board Styles
+// ============================================
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 0.5rem;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1rem;
+    background: @color-bg-card;
+    border-radius: @radius-2xl;
+    box-shadow: @shadow-xl;
+    border: 1px solid @color-border;
+}
+
+.cell {
+    background: @color-bg-secondary;
+    border-radius: @radius-lg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(4rem, 10vw, 8rem);
+    font-weight: 800;
+    cursor: pointer;
+    position: relative;
+    transition: all @transition-fast;
+    user-select: none;
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    height: 100%;
+
+    &:hover:not(.filled):not(.disabled) {
+        background: @color-bg-primary;
+        transform: scale(1.05);
+    }
+
+    &:active:not(.filled):not(.disabled) {
+        transform: scale(0.95);
+    }
+
+    // Mark styling
+    &.x {
+        color: @color-player-x;
+        animation: popIn @transition-bounce;
+    }
+
+    &.o {
+        color: @color-player-o;
+        animation: popIn @transition-bounce;
+    }
+
+    &.filled {
+        cursor: default;
+    }
+
+    &.disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+
+    // Winning cells
+    &.win {
+        background: fade(@color-win, 20%);
+        animation: winPulse 1s ease infinite;
+
+        &::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 3px solid @color-win;
+            border-radius: @radius-lg;
+            animation: winBorder 1s ease infinite;
+        }
+    }
+
+    // Hover preview
+    &:hover:not(.filled):not(.disabled)::before {
+        content: attr(data-preview);
+        opacity: 0.2;
+        position: absolute;
+    }
+}
+
+@keyframes popIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3) rotate(-10deg);
+    }
+    60% {
+        transform: scale(1.1) rotate(5deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+@keyframes winPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes winBorder {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}

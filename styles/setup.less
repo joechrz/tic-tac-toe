@@ -1,0 +1,162 @@
+// ============================================
+// Setup Modal Styles
+// ============================================
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: @color-bg-modal;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: @z-modal;
+    animation: fadeIn 300ms ease;
+
+    &.hidden {
+        display: none;
+    }
+}
+
+.modal-content {
+    background: @color-bg-card;
+    border-radius: @radius-2xl;
+    padding: @space-2xl;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: @shadow-xl;
+    border: 1px solid @color-border;
+    animation: slideUp 400ms ease;
+
+    h1 {
+        font-size: @font-size-3xl;
+        font-weight: 800;
+        font-family: @font-display;
+        text-align: center;
+        background: linear-gradient(135deg, @color-player-x, @color-player-o);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: @space-sm;
+    }
+}
+
+.modal-subtitle {
+    text-align: center;
+    color: @color-text-secondary;
+    font-size: @font-size-base;
+    margin-bottom: @space-xl;
+}
+
+.setup-options {
+    display: flex;
+    flex-direction: column;
+    gap: @space-xl;
+    margin-bottom: @space-xl;
+}
+
+.option-group {
+    display: flex;
+    flex-direction: column;
+    gap: @space-md;
+
+    label {
+        font-size: @font-size-sm;
+        font-weight: 600;
+        color: @color-text-secondary;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+}
+
+.symbol-selector,
+.first-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: @space-md;
+}
+
+.symbol-btn,
+.first-btn {
+    padding: @space-lg;
+    background: @color-bg-secondary;
+    color: @color-text-primary;
+    border: 2px solid @color-border;
+    border-radius: @radius-lg;
+    font-size: @font-size-lg;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all @transition-base;
+    position: relative;
+
+    &:hover {
+        background: @color-bg-primary;
+        border-color: @color-border-light;
+        transform: translateY(-2px);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    &.active {
+        background: linear-gradient(135deg, @color-player-x, @color-player-o);
+        border-color: transparent;
+        color: @color-text-primary;
+        box-shadow: 0 0 20px fade(@color-player-x, 30%);
+
+        &::after {
+            content: '✓';
+            position: absolute;
+            top: @space-xs;
+            right: @space-xs;
+            font-size: @font-size-sm;
+            background: fade(white, 20%);
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+}
+
+.symbol-display {
+    font-size: @font-size-2xl;
+    display: block;
+}
+
+.start-btn {
+    width: 100%;
+    padding: @space-lg;
+    background: linear-gradient(135deg, @color-player-x, @color-player-o);
+    color: @color-text-primary;
+    border: none;
+    border-radius: @radius-lg;
+    font-size: @font-size-lg;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all @transition-base;
+    box-shadow: 0 4px 20px fade(@color-player-x, 40%);
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 30px fade(@color-player-x, 50%);
+    }
+
+    &:active {
+        transform: translateY(-1px);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,236 +1,530 @@
-# User Guide
+# Tic-Tac-Toe User Guide
 
-A complete guide to playing and navigating the Tic Tac Toe game.
+Complete guide to playing and enjoying the Tic-Tac-Toe game.
 
 ## Table of Contents
 
 - [Getting Started](#getting-started)
-- [Mode Selection](#mode-selection)
-- [Game Rules](#game-rules)
-- [Playing vs Human](#playing-vs-human)
-- [Playing vs Computer](#playing-vs-computer)
-- [AI Difficulty Levels](#ai-difficulty-levels)
-- [Interface Overview](#interface-overview)
-- [Scoreboard](#scoreboard)
-- [Keyboard Navigation](#keyboard-navigation)
-- [Screen Reader Support](#screen-reader-support)
-- [Responsive Layout](#responsive-layout)
+- [Game Setup](#game-setup)
+- [How to Play](#how-to-play)
+- [Game Controls](#game-controls)
+- [Understanding the Interface](#understanding-the-interface)
+- [Tips and Strategies](#tips-and-strategies)
+- [Browser Compatibility](#browser-compatibility)
 - [Troubleshooting](#troubleshooting)
+- [Frequently Asked Questions](#frequently-asked-questions)
+
+---
 
 ## Getting Started
 
-1. Open `index.html` in any modern web browser (Chrome, Firefox, Safari, or Edge).
-2. No installation or internet connection is required.
-3. The game loads with a **mode selection overlay** where you choose how to play.
+### System Requirements
+- Modern web browser (Chrome 90+, Firefox 88+, Safari 14+, or Edge 90+)
+- JavaScript enabled
+- No installation required
+- Works offline after first load
 
-### Optional: Local Server
+### Opening the Game
 
-If you prefer to serve the file over HTTP:
+**Method 1: Direct File Opening**
+1. Download or clone the game files
+2. Double-click `index.html` to open in your default browser
+3. That's it!
 
+**Method 2: Local Server** (Recommended for best performance)
 ```bash
-cd game
-python3 -m http.server 8000
+# Navigate to game directory
+cd tic-tac-toe
+
+# Start a local server (choose one):
+python3 -m http.server 8000        # Python 3
+python -m SimpleHTTPServer 8000    # Python 2
+npx http-server -p 8000            # Node.js
+
+# Open browser to http://localhost:8000
 ```
 
-Then open `http://localhost:8000` in your browser.
+---
 
-## Mode Selection
+## Game Setup
 
-When the game loads, a mode selection overlay appears. This overlay also appears each time you click **New Game**.
+When you first open the game (or click "New Setup"), you'll see a configuration modal.
 
-### Game Mode
+### Step 1: Choose Your Symbol
 
-Choose between two modes:
+**Option X** - Traditionally the first player
+- Click the **X** button to play as X
+- You'll see a checkmark appear when selected
 
-- **vs Human** - Two players take turns on the same device.
-- **vs Computer** - Play against the AI opponent.
+**Option O** - Traditionally the second player
+- Click the **O** button to play as O
+- You'll see a checkmark appear when selected
 
-### AI Settings (vs Computer only)
+💡 **Tip:** In classic tic-tac-toe, X always goes first, but you can change that in Step 2!
 
-When you select **vs Computer**, two additional options appear:
+### Step 2: Choose Who Goes First
 
-- **Play as** - Choose your symbol:
-  - **X (First)** - You go first.
-  - **O (Second)** - The computer goes first.
-- **Difficulty** - Choose the AI strength:
-  - **Easy** - The computer makes random moves.
-  - **Medium** - The computer plays well most of the time but occasionally makes mistakes.
-  - **Hard** - The computer plays optimally and cannot be beaten (best you can achieve is a draw).
+**You Go First**
+- Click **You** to make the opening move
+- Recommended for beginners to get familiar with the game
 
-Click **Start Game** to begin with your chosen settings.
+**Computer Goes First**
+- Click **Computer** to let the AI start
+- More challenging as the AI will take the strategic center or corner
 
-## Game Rules
+💡 **Tip:** The computer is unbeatable, so letting it go first makes the game harder!
 
-Tic Tac Toe is a strategy game played on a 3x3 grid.
+### Step 3: Start the Game
 
-1. **Player X** always goes first.
-2. Players alternate turns, placing their mark (X or O) in an empty cell.
-3. The goal is to get **three of your marks in a row** - horizontally, vertically, or diagonally.
-4. If all nine cells are filled without a winner, the game ends in a **draw**.
+Click the **Start Game** button to begin playing with your chosen settings.
 
-### Winning Combinations
+---
 
-There are 8 possible winning lines:
+## How to Play
+
+### Basic Rules
+
+**Objective:** Get three of your symbols in a row (horizontal, vertical, or diagonal) before your opponent does.
+
+**Winning Combinations (8 total):**
+```
+Horizontal:  Vertical:   Diagonal:
+X X X        X _ _       X _ _
+_ _ _        X _ _       _ X _
+_ _ _        X _ _       _ _ X
+
+_ _ _        _ X _       _ _ X
+X X X        _ X _       _ X _
+_ _ _        _ X _       X _ _
+
+_ _ _        _ _ X
+_ _ _        _ _ X
+X X X        _ _ X
+```
+
+### Making Your Move
+
+1. **Wait for Your Turn**
+   - The turn indicator shows "Your turn" when it's your move
+   - Shows "Computer is thinking..." when the AI is deciding
+
+2. **Click a Cell**
+   - Click any empty cell in the 3×3 grid
+   - Your symbol (X or O) will appear with a smooth animation
+   - You cannot click already-filled cells
+
+3. **Computer Responds**
+   - The computer automatically makes its move (600ms delay)
+   - Watch as the computer's symbol appears
+
+4. **Continue Until Game Ends**
+   - Keep alternating turns until someone wins or the board fills up
+
+### Game End Conditions
+
+**You Win! 🎉**
+- Three of your symbols in a row
+- Winning cells are highlighted
+- Your score increases by 1
+- Game status shows "You win! 🎉"
+
+**Computer Wins**
+- Three computer symbols in a row
+- Winning cells are highlighted
+- Computer score increases by 1
+- Game status shows "Computer wins!"
+
+**Draw**
+- All 9 cells filled with no winner
+- Draw score increases by 1
+- Game status shows "It's a draw!"
+
+---
+
+## Game Controls
+
+### During Gameplay
+
+**New Game Button**
+- Starts a fresh game with the same settings
+- Board is cleared, but scores remain
+- Same symbol and first player choices
+
+**Reset Scores Button**
+- Clears all scores back to zero (0-0-0)
+- Does not reset the current game
+- Useful for starting a new match series
+
+**New Setup Button**
+- Returns to the setup modal
+- Allows you to change your symbol or first player
+- Scores are maintained
+
+### Keyboard Controls
+
+While keyboard navigation is available for setup buttons, the game is primarily mouse/touch-based for cell selection. Use:
+
+- **Tab** - Navigate between buttons
+- **Enter/Space** - Activate buttons
+- **Mouse Click** - Select cells (primary method)
+
+---
+
+## Understanding the Interface
+
+### Layout Overview
 
 ```
-Rows:               Columns:            Diagonals:
-X X X   . . .      X . .   . X .      X . .   . . X
-. . .   X X X      X . .   . X .      . X .   . X .
-. . .   . . .      X . .   . X .      . . X   X . .
+┌─────────────────────────────────────────┐
+│         Setup Modal (Initial)           │
+│    Symbol Choice | First Player         │
+│         [Start Game Button]             │
+└─────────────────────────────────────────┘
 
-. . .              . . X
-. . .              . . X
-X X X              . . X
+Desktop Layout:
+┌──────────────┬──────────────────────────┐
+│  Scoreboard  │    Game Header           │
+│  (Left)      │    ┌───────────┐         │
+│              │    │ Tic-Tac-  │         │
+│   You: 0     │    │   Toe     │         │
+│   Draw: 0    │    └───────────┘         │
+│   Computer:0 │                          │
+│              │    Your turn             │
+│  [Reset]     │                          │
+│  [New Setup] │    ┌───┬───┬───┐        │
+│              │    │   │   │   │        │
+│              │    ├───┼───┼───┤        │
+│              │    │   │   │   │        │
+│              │    ├───┼───┼───┤        │
+│              │    │   │   │   │        │
+│              │    └───┴───┴───┘        │
+│              │                          │
+│              │    [New Game]            │
+└──────────────┴──────────────────────────┘
+
+Mobile Layout:
+┌─────────────────────────────────┐
+│     Scoreboard (Top, Horizontal)│
+│   You: 0  |  Draw: 0  |  Comp: 0│
+├─────────────────────────────────┤
+│        Tic-Tac-Toe              │
+│        Your turn                │
+│                                 │
+│      ┌───┬───┬───┐             │
+│      │   │   │   │             │
+│      ├───┼───┼───┤             │
+│      │   │   │   │             │
+│      ├───┼───┼───┤             │
+│      │   │   │   │             │
+│      └───┴───┴───┘             │
+│                                 │
+│      [New Game]                 │
+└─────────────────────────────────┘
 ```
 
-## Playing vs Human
+### Scoreboard (Left Side / Top on Mobile)
 
-1. Select **vs Human** in the mode selector and click **Start Game**.
-2. **Player X** goes first. Click any empty cell to place your mark.
-3. **Player O** takes the next turn.
-4. The scoreboard labels show "Player X" and "Player O".
-5. Continue until someone wins or the board is full (draw).
-6. Click **Play Again** to start a new round with the same mode, or **New Game** to return to mode selection.
+**Your Score**
+- Shows wins where your symbol won
+- Displays your chosen symbol (X or O)
+- Labeled "You"
 
-## Playing vs Computer
+**Draw Score**
+- Shows total number of draws
+- Represented with a "−" symbol
 
-1. Select **vs Computer** in the mode selector.
-2. Choose your symbol (X or O) and difficulty level.
-3. Click **Start Game**.
-4. The scoreboard labels change to "You" and "Computer".
-5. Make your move by clicking an empty cell.
-6. The status bar shows **"Computer thinking..."** while the AI calculates its move.
-7. The board is temporarily disabled during the computer's turn (cells appear dimmed).
-8. After a brief delay, the computer places its mark and play returns to you.
-9. If you chose to play as O, the computer makes the first move automatically.
+**Computer Score**
+- Shows wins where the computer won
+- Displays the computer's symbol
+- Labeled "Computer"
 
-## AI Difficulty Levels
+**Buttons**
+- **Reset Scores** - Clears all scores
+- **New Setup** - Returns to configuration
 
-| Level  | Strategy | Can You Win? |
-|--------|----------|--------------|
-| **Easy** | Picks a random empty cell every turn. No strategy at all. | Yes, easily. |
-| **Medium** | Uses the optimal algorithm 60% of the time and picks randomly 40% of the time. Makes occasional mistakes. | Yes, with some skill. |
-| **Hard** | Always plays the mathematically optimal move using the minimax algorithm. Never makes a mistake. | No. The best possible result is a draw. |
+### Game Area
 
-### Tips for Playing Against Hard AI
+**Game Title**
+- "Tic-Tac-Toe" with gradient effect
+- Always visible at top
 
-- If you go first (X), take the center cell. This gives you the best chance of forcing a draw.
-- Never leave two of the AI's marks in a row without blocking.
-- The AI will always block your winning moves and take its own when available.
-- On Hard difficulty, a draw is a good result!
+**Turn Indicator**
+- Shows whose turn it is
+- "Your turn" (your color)
+- "Computer is thinking..." (computer's color)
+- "Game Over" (when complete)
 
-## Interface Overview
+**Game Board**
+- 3×3 grid of cells
+- Empty cells are clickable
+- Filled cells show X or O with color
+- Winning cells are highlighted with pulsing border
 
-### Mode Selection Overlay
-Appears on game load and when clicking **New Game**. Lets you choose game mode, symbol, and difficulty.
+**Game Status**
+- Empty during play
+- Shows result: "You win! 🎉", "Computer wins!", or "It's a draw!"
+- Color-coded (green for win, amber for draw)
 
-### Header
-Displays the game title with an animated gradient effect.
+---
 
-### Status Bar
-Displays whose turn it is, or the game result. Text color matches the current player:
-- **Coral/red** text = X's turn (or "Your turn" / "Computer thinking...")
-- **Blue** text = O's turn
-- **Green** pulsing text = Win announcement
-- **Gold** text = Draw announcement
+## Tips and Strategies
 
-### Scoreboard
-Displayed to the left of the board on desktop, above the board on mobile. Shows scores for X, draws, and O. In AI mode, labels change to "You" and "Computer". The active player's section is highlighted with a side accent.
+### For Beginners
 
-### Game Board
-A 3x3 grid of clickable cells. Hovering over an empty cell shows a faint preview of the current player's mark. During the AI's turn, empty cells are dimmed and unclickable.
+**1. Control the Center**
+- The center cell (middle) is the most powerful position
+- It's part of 4 different winning combinations
+- Try to take it early if possible
 
-### Control Buttons
-- **New Game** - Returns to the mode selection overlay.
-- **Reset Scores** - Zeros out all scores (X wins, O wins, and draws).
+**2. Watch for Forks**
+- A "fork" is when you create two ways to win
+- This forces your opponent to block one, letting you win with the other
+- Example: X in corners 0 and 2, then taking center creates a fork
 
-### Game Over Overlay
-Appears after a win or draw with the result and a **Play Again** button. In AI mode, the result shows "You Wins!" or "Computer Wins!" accordingly.
+**3. Block Immediately**
+- If the computer has two in a row, block the third cell immediately
+- Don't get distracted by your own plans
 
-## Scoreboard
+**4. Corners Are Strong**
+- Corner cells (0, 2, 6, 8) are the second-best positions
+- They're part of 3 winning combinations each
 
-The scoreboard persists across rounds within a single browser session:
+### Understanding the AI
 
-| Section      | Color      | Tracks                    |
-|-------------|------------|---------------------------|
-| X (or You)  | Coral/Red  | X's total wins            |
-| Draws       | Gold       | Total draws               |
-| O (or Computer) | Blue  | O's total wins            |
+**The Computer Is Unbeatable**
+- It uses the minimax algorithm to play perfectly
+- Against perfect play, the best you can do is draw
+- Don't get discouraged - even experienced players can't beat it!
 
-Labels automatically update based on game mode:
-- **vs Human**: "Player X" / "Player O"
-- **vs Computer**: "You" / "Computer" (positioned based on your chosen symbol)
+**AI Strategy**
+1. **Opening Move:** Takes center if available, otherwise a corner
+2. **Immediate Win:** Takes any move that wins the game
+3. **Block:** Blocks any move where you would win
+4. **Optimal:** Calculates all possible outcomes and chooses best
 
-Scores reset when:
-- You click **Reset Scores**
-- You refresh or close the browser tab
+**How to Get a Draw**
+- Play defensively and block every threat
+- Don't make mistakes that create easy wins for the AI
+- With perfect play from both sides, every game should be a draw
 
-## Keyboard Navigation
+### Advanced Strategies
 
-All game elements are keyboard-accessible:
+**Opening Principles**
+- If you go first: Take the center
+- If computer goes first and takes center: Take a corner
+- If computer goes first and takes corner: Take the center
 
-| Key         | Action                                         |
-|-------------|-------------------------------------------------|
-| `Tab`       | Move focus between cells, buttons, and mode options |
-| `Enter`     | Place mark / click button / select mode option  |
-| `Space`     | Place mark / click button / select mode option  |
+**Avoiding Losses**
+- Never let the computer create a fork (two ways to win)
+- After computer's first move in a corner, don't take the opposite corner
+- Always block immediately when computer has two in a row
 
-Focus indicators appear as blue outlines on the currently focused element. The mode selection overlay and game-over overlay trap focus appropriately.
+---
 
-## Screen Reader Support
+## Browser Compatibility
 
-The game includes accessibility features for screen readers:
+### Fully Supported Browsers
 
-- Each cell announces its position and state (e.g., "Row 1, Column 2 - empty" or "Row 1, Column 2 - X").
-- The status bar uses `aria-live="polite"` so turn changes, AI thinking status, and results are announced automatically.
-- Mode selection options use `aria-pressed` to indicate the selected state.
-- Both the mode selection overlay and game-over overlay use `role="dialog"` with `aria-modal="true"`.
-- Decorative elements (symbols in the scoreboard, confetti) are hidden from screen readers with `aria-hidden`.
+| Browser | Minimum Version | Notes |
+|---------|----------------|-------|
+| Google Chrome | 90+ | Full support, recommended |
+| Microsoft Edge | 90+ | Full support, recommended |
+| Mozilla Firefox | 88+ | Full support |
+| Safari (macOS) | 14+ | Full support |
+| Safari (iOS) | 14+ | Full support, touch optimized |
+| Chrome (Android) | 90+ | Full support, touch optimized |
 
-## Responsive Layout
+### Required Features
+- ES2020 JavaScript modules
+- CSS Grid and Flexbox
+- CSS Custom Properties (variables)
+- Modern Array methods
 
-The game adapts to different screen sizes:
+### Not Supported
+- Internet Explorer (any version)
+- Legacy browsers without ES6+ support
 
-| Device              | Behavior                                               |
-|---------------------|--------------------------------------------------------|
-| Desktop (600px+)    | Scoreboard left of board, side-by-side layout          |
-| Mobile (< 600px)    | Scoreboard above board, stacked layout                 |
-| Small phones (< 360px) | Compact scoreboard, stacked control buttons         |
-| Landscape phone     | Reduced vertical spacing, smaller board                |
-
-### Reduced Motion
-
-If your operating system is set to reduce motion (e.g., macOS "Reduce motion" setting), all animations are effectively disabled for a static experience.
+---
 
 ## Troubleshooting
 
-### Game doesn't load
-- Ensure you're opening `index.html` directly or via a local server.
-- Check that JavaScript is enabled in your browser.
-- Use a modern browser (Chrome 88+, Firefox 78+, Safari 14+, Edge 88+).
+### Game Won't Load
 
-### Mode selection overlay won't dismiss
-- You must click the **Start Game** button. Clicking outside the overlay does not close it.
+**Problem:** Blank screen or "Loading..." message
+**Solutions:**
+1. Ensure JavaScript is enabled in your browser
+2. Check browser console for errors (F12 → Console tab)
+3. Try opening in a different browser
+4. Clear browser cache and reload
+5. Use a local server instead of opening file directly
 
-### Cells don't respond to clicks
-- The game may be over. Look for the game-over overlay or check the status bar.
-- In AI mode, cells are disabled while the computer is thinking. Wait for the AI to finish.
-- If the mode selection overlay is showing, select a mode and click Start Game first.
-- Click **New Game** or **Play Again** to start a new round.
+**Problem:** "Failed to initialize game" error
+**Solutions:**
+1. Check that all files are present (dist/, styles/main.css)
+2. Verify index.html references correct JavaScript file
+3. Look for specific error in browser console
+4. Try refreshing the page
 
-### Computer doesn't move
-- The AI has a short artificial delay (400-800ms) to feel natural. Wait a moment.
-- If the AI still doesn't move, try clicking **New Game** to reset.
+### Game Behavior Issues
 
-### Animations are choppy
-- Close other resource-intensive tabs or applications.
-- If you prefer no animations, enable "Reduce motion" in your OS accessibility settings.
+**Problem:** Clicks not registering
+**Solutions:**
+1. Ensure it's your turn (check turn indicator)
+2. Don't click already-filled cells
+3. Wait for computer to finish its move
+4. Try clicking center of cell, not edges
 
-### Scores disappeared
-- Scores are stored in memory only and reset on page refresh.
-- This is expected behavior in the current version.
+**Problem:** Computer not moving
+**Solutions:**
+1. Wait 600ms - there's intentional delay for UX
+2. Check browser console for JavaScript errors
+3. Refresh page if computer seems frozen
 
-### Layout looks broken
-- Ensure your browser zoom is at 100%.
-- Try a different browser to rule out compatibility issues.
-- Check that your browser meets the minimum version requirements.
+**Problem:** Scores not updating
+**Solutions:**
+1. Check that game actually ended (win or draw)
+2. Verify scoreboard is visible (not hidden offscreen)
+3. Try "Reset Scores" then play a new game
+
+### Display Issues
+
+**Problem:** Layout looks broken on mobile
+**Solutions:**
+1. Rotate device to check if it's orientation-specific
+2. Zoom out if zoomed in too far
+3. Try refreshing page
+4. Clear browser cache
+
+**Problem:** Colors look wrong
+**Solutions:**
+1. Check browser color settings / dark mode
+2. Ensure CSS file loaded (check Network tab in DevTools)
+3. Try different browser
+
+**Problem:** Animations not working
+**Solutions:**
+1. Check if "Reduce motion" is enabled in OS accessibility settings
+2. Game respects `prefers-reduced-motion` preference
+3. This is intentional for accessibility
+
+### Mobile-Specific Issues
+
+**Problem:** Can't tap cells reliably
+**Solutions:**
+1. Tap center of cells, not edges
+2. Disable zoom if enabled
+3. Use single tap, not double-tap
+4. Check if screen protector is interfering
+
+**Problem:** Scoreboard not visible
+**Solutions:**
+1. Scroll up - on mobile, scoreboard is at top
+2. Rotate to landscape for side-by-side view
+3. Zoom out if zoomed in
+
+---
+
+## Frequently Asked Questions
+
+### General Questions
+
+**Q: Do I need an internet connection?**
+A: No, once loaded, the game works completely offline.
+
+**Q: Do I need to install anything?**
+A: No, it runs directly in your web browser.
+
+**Q: Can I play against another person?**
+A: Currently, no. The game only supports player vs. computer. Local multiplayer may be added in future versions.
+
+**Q: Is there a way to make the computer easier to beat?**
+A: No, the current version only has one difficulty level (unbeatable). Easy/medium modes may be added in the future.
+
+**Q: Are my scores saved when I close the browser?**
+A: No, scores reset when you refresh or close the page. Score persistence may be added in future.
+
+### Gameplay Questions
+
+**Q: Can I undo a move?**
+A: No, all moves are final. This is intentional to match physical tic-tac-toe rules.
+
+**Q: Can X go second?**
+A: Yes! In the setup modal, choose X as your symbol, then select "Computer" to go first.
+
+**Q: Why does the computer always win or draw?**
+A: The computer uses perfect play (minimax algorithm). With optimal play from both sides, tic-tac-toe always ends in a draw.
+
+**Q: How long does the computer take to think?**
+A: The AI calculates instantly but waits 500-600ms for better UX. This delay makes the game feel more natural.
+
+**Q: Can I change my symbol mid-game?**
+A: No, click "New Setup" to start over with different settings.
+
+### Technical Questions
+
+**Q: What technology is this built with?**
+A: TypeScript, vanilla JavaScript (ES modules), LESS CSS, and HTML5. No frameworks.
+
+**Q: Can I customize the colors or theme?**
+A: Yes! See [CUSTOMIZATION.md](CUSTOMIZATION.md) for a complete guide.
+
+**Q: Can I use this in my own project?**
+A: Yes, it's open source under the MIT License. Attribution appreciated.
+
+**Q: Where is the source code?**
+A: All source code is in the `src/` folder (TypeScript) and compiled to `dist/` (JavaScript).
+
+---
+
+## Getting Help
+
+If you encounter issues not covered in this guide:
+
+1. **Check the Browser Console**
+   - Press F12 or right-click → Inspect
+   - Look at the Console tab for error messages
+
+2. **Review Other Documentation**
+   - [Developer Guide](DEVELOPER_GUIDE.md) - Technical details
+   - [API Reference](API_REFERENCE.md) - Code documentation
+   - [Troubleshooting](#troubleshooting) - Common issues
+
+3. **Open an Issue**
+   - Describe the problem clearly
+   - Include browser and OS version
+   - Share any console errors
+   - Explain steps to reproduce
+
+---
+
+## Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| Tab | Navigate between interactive elements |
+| Enter / Space | Activate buttons in setup modal |
+| Mouse Click | Primary interaction for cell selection |
+
+**Note:** The game is primarily mouse/touch-driven. Keyboard shortcuts are limited to button navigation.
+
+---
+
+## Accessibility Features
+
+This game includes several accessibility features:
+
+- ✅ **Semantic HTML** - Proper heading structure
+- ✅ **ARIA Labels** - Screen reader support for all interactive elements
+- ✅ **Color Contrast** - WCAG AA compliant color ratios
+- ✅ **Keyboard Navigation** - Tab through all interactive elements
+- ✅ **Focus Indicators** - Visible outlines on focused elements
+- ✅ **Reduced Motion** - Respects OS preference for reduced animations
+- ✅ **Large Touch Targets** - Minimum 44x44px on mobile
+
+For feedback on accessibility, please open an issue.
+
+---
+
+**Enjoy playing Tic-Tac-Toe!** 🎮
+
+**Version:** 1.0.0 | **Last Updated:** 2026-02-17
